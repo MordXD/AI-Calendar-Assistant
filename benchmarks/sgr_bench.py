@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+import pathlib
 from statistics import mean
 from time import perf_counter
 from typing import List
@@ -67,7 +68,8 @@ class BenchmarkCalendar:
         return self._busy
 
 
-def run(iterations: int = 250) -> None:
+def run(iterations: int = 10) -> None:
+    
     controller = SGRController(llm=BenchmarkLLM(), calendar=BenchmarkCalendar())
     request = SuggestEventsRequest(instruction="Benchmark planning", timezone=_DEFAULT_TZ)
 
@@ -93,4 +95,7 @@ def run(iterations: int = 250) -> None:
 
 
 if __name__ == "__main__":  # pragma: no cover - manual entrypoint
+    from dotenv import load_dotenv
+    BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+    load_dotenv(BASE_DIR / ".env")
     run()
