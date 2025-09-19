@@ -1,63 +1,100 @@
 from __future__ import annotations
-from typing import List, Optional, Literal
-from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
 
-class Attendee(BaseModel):
+from datetime import datetime
+from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+
+
+class StrictModel(BaseModel):
+    """Base class enforcing consistent validation rules."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class Attendee(StrictModel):
     email: str
     optional: bool = False
 
-class Reminder(BaseModel):
-    method: Literal["popup", "email"] = "popup"
-    minutes_before: int = Field(15, ge=0)
 
-class Recurrence(BaseModel):
+class Reminder(StrictModel):
+    method: Literal["popup", "email"] = "popup"
+    minutes_before: int = Field(default=15, ge=0)
+
+
+class Recurrence(StrictModel):
     rrule: Optional[str] = None  # e.g., "RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR"
 
-class CalendarEvent(BaseModel):
+
+class EventDraft(StrictModel):
+    title: str
+    description: Optional[str] = None
+    start: datetime
+    end: datetime
+    timezone: Optional[str] = None
+    location: Optional[str] = None
+    attendees: list[Attendee] = Field(default_factory=list)
+    reminders: list[Reminder] = Field(default_factory=list)
+    recurrence: Optional[Recurrence] = None
+    source: Optional[str] = None
+
+
+class CalendarEvent(StrictModel):
     title: str
     description: Optional[str] = None
     start: datetime
     end: datetime
     timezone: str = "Europe/Riga"
     location: Optional[str] = None
-    attendees: List[Attendee] = []
-    reminders: List[Reminder] = [Reminder()]
+    attendees: list[Attendee] = Field(default_factory=list)
+    reminders: list[Reminder] = Field(default_factory=lambda: [Reminder()])
     recurrence: Optional[Recurrence] = None
-    source: Optional[str] = None   # free text (why this event exists)
+    source: Optional[str] = None  # free text (why this event exists)
 
     @field_validator("end")
     @classmethod
-    def _end_after_start(cls, v: datetime, values: dict):
-        start = values.get("start")
-        if start and v <= start:
+    def _end_after_start(cls, value: datetime, info: ValidationInfo) -> datetime:
+        start = info.data.get("start") if isinstance(info.data, dict) else None
+        if isinstance(start, datetime) and value <= start:
             raise ValueError("end must be after start")
-        return v
+        return value
 
-class SuggestEventsRequest(BaseModel):
+
+class SuggestionPayload(StrictModel):
+    """Structured LLM response with candidate events."""
+
+    candidates: list[EventDraft]
+
+
+class SuggestEventsRequest(StrictModel):
     instruction: str
     now: Optional[datetime] = None
     timezone: str = "Europe/Riga"
 
-class SuggestEventsResponse(BaseModel):
+
+class SuggestEventsResponse(StrictModel):
     candidates: list[CalendarEvent]
     trace_id: str
 
-class CommitDecision(BaseModel):
+
+class CommitDecision(StrictModel):
     kind: Literal["create", "update", "skip"] = "create"
     reason: Optional[str] = None
 
-class CommitPlanItem(BaseModel):
+
+class CommitPlanItem(StrictModel):
     event: CalendarEvent
     decision: CommitDecision
 
-class CommitPlan(BaseModel):
+
+class CommitPlan(StrictModel):
     items: list[CommitPlanItem]
     trace_id: str
 
-class CommitResult(BaseModel):
+
+class CommitResult(StrictModel):
     created: int
     updated: int
     skipped: int
-    errors: list[str] = []
+    errors: list[str] = Field(default_factory=list)
     trace_id: str

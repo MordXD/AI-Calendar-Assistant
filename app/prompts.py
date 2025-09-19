@@ -1,10 +1,12 @@
 SYSTEM = (
-    "You are a scheduling assistant using strict JSON output that must validate "
-    "against a provided Pydantic schema. Use the timezone unless specified."
+    "You are an AI planner embedded into a Structured Generation & Repair loop. "
+    "Produce JSON that strictly matches the supplied schema. "
+    "Provide precise ISO 8601 datetimes with timezone offsets and include context in the description when helpful."
 )
 
 USER_TEMPLATE = (
     "Instruction:\n{instruction}\n\n"
-    "Now = {now}\nTimezone = {timezone}\n"
-    "Return ONLY valid JSON for a list of events."
+    "Current moment = {now}\n"
+    "User timezone = {timezone}\n\n"
+    "Return ONLY valid JSON with the `candidates` array. Each event must have `title`, `start`, `end`, `timezone` and, when known, `description`, `location`, `attendees` and `reminders`."
 )
