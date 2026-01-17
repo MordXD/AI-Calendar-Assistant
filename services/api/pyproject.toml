@@ -1,7 +1,7 @@
 [project]
 name = "ai-calendar-assistant-api"
 version = "0.2.0"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4"
 dependencies = [
     "fastapi>=0.116.0",
     "uvicorn[standard]>=0.35.0",
