@@ -1,0 +1,55 @@
+{
+  "realm": "calendar",
+  "enabled": true,
+  "sslRequired": "external",
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Regular calendar user"
+      },
+      {
+        "name": "admin",
+        "description": "Calendar administrator"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "calendar-api",
+      "name": "Calendar API",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "calendar-api-secret",
+      "redirectUris": ["http://localhost:8000/*"],
+      "webOrigins": ["http://localhost:8000"],
+      "protocol": "openid-connect",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "attributes": {
+        "access.token.lifespan": "3600"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "test-user",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "test@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["user"]
+    }
+  ]
+}

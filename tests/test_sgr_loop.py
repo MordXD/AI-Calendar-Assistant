@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from app.models import (
+from models import (
     CalendarEvent,
     CommitDecision,
     CommitPlan,
@@ -12,7 +12,7 @@ from app.models import (
     SuggestEventsRequest,
     SuggestionPayload,
 )
-from app.sgr import SGRController
+from sgr import SGRController
 
 
 class StubLLM:

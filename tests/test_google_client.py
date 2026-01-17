@@ -3,9 +3,9 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from app.models import CalendarEvent, Reminder
-from app.services.google_calendar import GoogleCalendarClient
-from app.services.sqlite_store import CalendarSQLiteStore
+from models import CalendarEvent, Reminder
+from services.google_calendar import GoogleCalendarClient
+from services.sqlite_store import CalendarSQLiteStore
 
 
 def _sample_event() -> CalendarEvent:

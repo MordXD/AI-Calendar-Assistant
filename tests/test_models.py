@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import pytest
-from app.models import CalendarEvent
+from models import CalendarEvent
 
 
 def test_event_end_after_start():
